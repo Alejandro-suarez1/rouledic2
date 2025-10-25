@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/rouledic2/static/css/main.30d9047e.css",
+    "main.js": "/rouledic2/static/js/main.a9aa6e08.js",
+    "index.html": "/rouledic2/index.html",
+    "main.30d9047e.css.map": "/rouledic2/static/css/main.30d9047e.css.map",
+    "main.a9aa6e08.js.map": "/rouledic2/static/js/main.a9aa6e08.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.30d9047e.css",
+    "static/js/main.a9aa6e08.js"
+  ]
+}
