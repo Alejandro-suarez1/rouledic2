@@ -16,9 +16,9 @@ function getDocena(n) {
 }
 function labelDocena(d) {
   if (d === 0) return 'Cero (0)';
-  if (d === 1) return '1ª (1–12)';
-  if (d === 2) return '2ª (13–24)';
-  if (d === 3) return '3ª (25–36)';
+  if (d === 1) return '1ª';
+  if (d === 2) return '2ª';
+  if (d === 3) return '3ª';
   return '-';
 }
 
