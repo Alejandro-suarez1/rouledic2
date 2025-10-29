@@ -328,7 +328,7 @@ const scores = useMemo(() => {
             onKeyDown={(e) => e.key === 'Enter' && handleAddFromInput()}
           />
           <button className="btn primary" onClick={handleAddFromInput}>Agregar</button>
-          <button className="btn muted" onClick={handleDeleteLast}>Eliminar</button>
+          <button className="btn muted" onClick={handleDeleteLast}>Eliminar ultimo número</button>
           <button className="btn danger" onClick={handleResetAll}>Reiniciar</button>
         </div>
       </header>
@@ -337,17 +337,23 @@ const scores = useMemo(() => {
         <section className="left">
           <div className="section card">
             <div className="section-header">
-              <h2>Análisis Actual</h2>
               <div className="settings">
-                <label>Analizar últimos:
+              <h2>Análisis Actual</h2>
+                <label className='styled-select-label'>Analizar últimos:
                   <select value={analyzeLast} onChange={(e) => setAnalyzeLast(Number(e.target.value))}>
                     <option value={10}>10</option>
                     <option value={20}>20</option>
                     <option value={30}>30</option>
+                    <option value={40}>40</option>
                     <option value={50}>50</option>
+                    <option value={60}>60</option>
+                    <option value={70}>70</option>
+                    <option value={80}>80</option>
+                    <option value={90}>90</option>
+                    <option value={100}>100</option>
                   </select>
                 </label>
-                <label style={{display:'flex',alignItems:'center',gap:8}}>
+                <label className='styled-checkbox'>
                   <input type="checkbox" checked={useAltDocena} onChange={(e)=>setUseAltDocena(e.target.checked)} /> Jugar docena alternativa
                 </label>
               </div>
@@ -364,7 +370,7 @@ const scores = useMemo(() => {
                       <tr key={d} className={currentPred && currentPred.primary===d? 'predicted':''}>
                         <td>{labelDocena(d)}</td>
                         <td>{d===1?'1–12':d===2?'13–24':'25–36'}</td>
-                        <td>{((counts[d]/totalAnalyzed)*100).toFixed(1)}%</td>
+                        <td>{counts[d]||'—'}</td>
                         <td>{absence[d]===null?'—':absence[d]}</td>
                         <td>{streak[d]||'—'}</td>
                         <td>{scores[d].toFixed(3)}</td>
@@ -448,7 +454,7 @@ const scores = useMemo(() => {
         </aside>
       </main>
 
-      <footer className="footer">v2.1</footer>
+      <footer className="footer">v2.0</footer>
     </div>
   );
 }
