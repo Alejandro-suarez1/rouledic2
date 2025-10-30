@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
-
+import Login from './Login';
 
 const LS_KEY = 'ruleta_predictor_v2_1';
 const FIB = [1, 1, 2, 3, 5, 8, 13, 21];
@@ -31,6 +31,14 @@ export default function App() {
   const [botStats, setBotStats] = useState({ won: 0, lost: 0 });
   const [fiboIndex, setFiboIndex] = useState(0);
   const [currentPred, setCurrentPred] = useState(null); // {primary, alt?, score, roundsHeld}
+  
+  const [user, setUser] = useState(localStorage.getItem("loggedUser") || null);
+  const handleLogin = (username) => setUser(username);
+  const handleLogout = () => {
+    localStorage.removeItem("loggedUser");
+    setUser(null);
+  };
+
 
   // load
   useEffect(() => {
@@ -313,148 +321,290 @@ const scores = useMemo(() => {
 
   const latestPred = predictions.length ? predictions[predictions.length - 1] : null;
 
-  return (
-    <div className="app-root">
-      <header className="topbar">
-        <div className="logo"><h1>Rouledict</h1></div>
-        <div className="controls">
-          <input
-            type="number"
-            min={0}
-            max={36}
-            placeholder="Número 0–36"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleAddFromInput()}
-          />
-          <button className="btn primary" onClick={handleAddFromInput}>Agregar</button>
-          <button className="btn muted" onClick={handleDeleteLast}>Eliminar ultimo número</button>
-          <button className="btn danger" onClick={handleResetAll}>Reiniciar</button>
-        </div>
-      </header>
+return (
+  <>
+    {!user ? (
+      // 🧠 Si NO hay usuario logueado, muestra el login
+      <Login onLogin={handleLogin} />
+    ) : (
+      // ✅ Si está logueado, muestra la app completa
+      <div className="app-root">
+        <header className="topbar">
+          <div className="logo">
+            <h1>Rouledict</h1>
+          </div>
+          <div className="controls">
+            <input
+              type="number"
+              min={0}
+              max={36}
+              placeholder="Número 0–36"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAddFromInput()}
+            />
 
-      <main className="main">
-        <section className="left">
-          <div className="section card">
-            <div className="section-header">
-              <div className="settings">
-              <h2>Análisis Actual</h2>
-                <label className='styled-select-label'>Analizar últimos:
-                  <select value={analyzeLast} onChange={(e) => setAnalyzeLast(Number(e.target.value))}>
-                    <option value={10}>10</option>
-                    <option value={20}>20</option>
-                    <option value={30}>30</option>
-                    <option value={40}>40</option>
-                    <option value={50}>50</option>
-                    <option value={60}>60</option>
-                    <option value={70}>70</option>
-                    <option value={80}>80</option>
-                    <option value={90}>90</option>
-                    <option value={100}>100</option>
-                  </select>
-                </label>
-                <label className='styled-checkbox'>
-                  <input type="checkbox" checked={useAltDocena} onChange={(e)=>setUseAltDocena(e.target.checked)} /> Jugar docena alternativa
-                </label>
+            <button className="btn primary" onClick={handleAddFromInput}>
+              Agregar
+            </button>
+            <button className="btn muted" onClick={handleDeleteLast}>
+              Eliminar último número
+            </button>
+            <button className="btn danger" onClick={handleResetAll}>
+              Reiniciar
+            </button>
+             <button className="btn logout" onClick={handleLogout}>
+              Cerrar sesión
+            </button>
+          </div>
+        </header>
+
+        <main className="main">
+          <section className="left">
+            <div className="section card">
+              <div className="section-header">
+                <div className="settings">
+                  <h2>Análisis Actual</h2>
+                  <label className="styled-select-label">
+                    Analizar últimos:
+                    <select
+                      value={analyzeLast}
+                      onChange={(e) =>
+                        setAnalyzeLast(Number(e.target.value))
+                      }
+                    >
+                      {[10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="styled-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={useAltDocena}
+                      onChange={(e) =>
+                        setUseAltDocena(e.target.checked)
+                      }
+                    />{" "}
+                    Jugar docena alternativa
+                  </label>
+                </div>
               </div>
-            </div>
 
-            <div className="analysis-grid">
-              <div className="analysis-table">
-                <table>
-                  <thead>
-                    <tr><th>Docena</th><th>Rango</th><th>Frecuencia</th><th>Ausencia</th><th>Racha</th><th>Score</th></tr>
-                  </thead>
-                  <tbody>
-                    {[1,2,3].map((d)=> (
-                      <tr key={d} className={currentPred && currentPred.primary===d? 'predicted':''}>
-                        <td>{labelDocena(d)}</td>
-                        <td>{d===1?'1–12':d===2?'13–24':'25–36'}</td>
-                        <td>{counts[d]||'—'}</td>
-                        <td>{absence[d]===null?'—':absence[d]}</td>
-                        <td>{streak[d]||'—'}</td>
-                        <td>{scores[d].toFixed(3)}</td>
+              <div className="analysis-grid">
+                <div className="analysis-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Docena</th>
+                        <th>Rango</th>
+                        <th>Frecuencia</th>
+                        <th>Ausencia</th>
+                        <th>Racha</th>
+                        <th>Score</th>
                       </tr>
+                    </thead>
+                    <tbody>
+                      {[1, 2, 3].map((d) => (
+                        <tr
+                          key={d}
+                          className={
+                            currentPred && currentPred.primary === d
+                              ? "predicted"
+                              : ""
+                          }
+                        >
+                          <td>{labelDocena(d)}</td>
+                          <td>
+                            {d === 1
+                              ? "1–12"
+                              : d === 2
+                              ? "13–24"
+                              : "25–36"}
+                          </td>
+                          <td>{counts[d] || "—"}</td>
+                          <td>
+                            {absence[d] === null ? "—" : absence[d]}
+                          </td>
+                          <td>{streak[d] || "—"}</td>
+                          <td>{scores[d].toFixed(3)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="chart-box">
+                  <ResponsiveContainer width="100%" height={180}>
+                    <BarChart
+                      data={chartData}
+                      margin={{ top: 10, right: 12, left: 0, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.06} />
+                      <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                      <YAxis tickFormatter={(v) => v + "%"} />
+                      <Tooltip formatter={(v) => `${v}%`} />
+                      <Bar dataKey="score" fill="#00d4ff" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                  <div className="chart-legend">Score (0..100)</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="section card small">
+              <h3>Historial de números (último a la izquierda)</h3>
+              <div className="hist-list reverse">
+                {numbers.length === 0 && (
+                  <div className="muted">No hay números aún</div>
+                )}
+                {numbers.map((n, i) => (
+                  <span key={i} className={`hist-num doc-${getDocena(n)}`}>
+                    {n}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <aside className="right">
+            <div className="section card prediction-area">
+              <h3>Predicción Actual</h3>
+              {currentPred ? (
+                <div
+                  className={`pred-card ${
+                    latestPred && latestPred.result === "win"
+                      ? "pred-win"
+                      : latestPred && latestPred.result === "loss"
+                      ? "pred-lose"
+                      : ""
+                  }`}
+                >
+                  <div className="pred-main">
+                    <div className="pred-docena">
+                      {labelDocena(currentPred.primary)}
+                      {useAltDocena && currentPred.alt
+                        ? ` + ${labelDocena(currentPred.alt)}`
+                        : ""}
+                    </div>
+                    <div className="pred-score">
+                      {(currentPred.score * 100).toFixed(1)}%
+                    </div>
+                  </div>
+                  <div className="pred-strength">
+                    {strengthLabel(currentPred.score)}
+                  </div>
+                  <div className="pred-meta">
+                    Rondas retenidas: {currentPred.roundsHeld}
+                  </div>
+                  <div className="pred-plenos">
+                    Plenos:{" "}
+                    {recommendPlenos(currentPred.primary, 6).map((n) => (
+                      <span key={n} className="pleno-pill">
+                        {n}
+                      </span>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="chart-box">
-                <ResponsiveContainer width="100%" height={180}>
-                  <BarChart data={chartData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.06} />
-                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                    <YAxis tickFormatter={(v)=> v + '%'} />
-                    <Tooltip formatter={(v)=> `${v}%`} />
-                    <Bar dataKey="score" fill="#00d4ff" />
-                  </BarChart>
-                </ResponsiveContainer>
-                <div className="chart-legend">Score (0..100)</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="section card small">
-            <h3>Historial de números (último a la izquierda)</h3>
-            <div className="hist-list reverse">
-              {numbers.length===0 && <div className="muted">No hay números aún</div>}
-              {numbers.map((n,i)=> <span key={i} className={`hist-num doc-${getDocena(n)}`}>{n}</span>)}
-            </div>
-          </div>
-        </section>
-
-        <aside className="right">
-          <div className="section card prediction-area">
-            <h3>Predicción Actual</h3>
-            {currentPred ? (
-              <div className={`pred-card ${latestPred && latestPred.result==='win'? 'pred-win' : latestPred && latestPred.result==='loss' ? 'pred-lose' : ''}`}>
-                <div className="pred-main">
-                  <div className="pred-docena">{labelDocena(currentPred.primary)}{useAltDocena && currentPred.alt? ` + ${labelDocena(currentPred.alt)}` : ''}</div>
-                  <div className="pred-score">{(currentPred.score*100).toFixed(1)}%</div>
-                </div>
-                <div className="pred-strength">{strengthLabel(currentPred.score)}</div>
-                <div className="pred-meta">Rondas retenidas: {currentPred.roundsHeld}</div>
-                <div className="pred-plenos">Plenos: {recommendPlenos(currentPred.primary,6).map(n=> <span key={n} className="pleno-pill">{n}</span>)}{useAltDocena && currentPred.alt? <> • Alt plenos: {recommendPlenos(currentPred.alt,4).map(n=> <span key={n} className="pleno-pill">{n}</span>)}</> : null}</div>
-              </div>
-            ) : (
-              <div className="muted">Esperando al menos 10 tiros para predecir...</div>
-            )}
-
-            <div className="bot-stats">
-              <div className="stat"><div className="stat-num">{botStats.won}</div><div className="stat-label">Ganadas</div></div>
-              <div className="stat"><div className="stat-num">{botStats.lost}</div><div className="stat-label">Perdidas</div></div>
-              <div className="stat"><div className="stat-num">{effectiveness}%</div><div className="stat-label">Efectividad</div></div>
-            </div>
-
-            <div className="fibo-box">
-              <div>Fibo ronda: <strong>{fiboIndex+1}</strong></div>
-              <div>Apuesta: <strong>{FIB[Math.min(fiboIndex, FIB.length-1)]}</strong></div>
-            </div>
-          </div>
-
-          <div className="section card history-card">
-            <h3>Historial de Predicciones</h3>
-            <div className="pred-history">
-              {predictions.length===0 && <div className="muted">Sin predicciones</div>}
-              {predictions.slice().reverse().map((p)=> (
-                <div key={p.id} className={`pred-row ${p.result==='win'?'win':p.result==='loss'?'loss':''}`}>
-                  <div className="pred-row-left">
-                    <div className="pred-label">{labelDocena(p.predictedDocena)}{p.altPred? ` + ${labelDocena(p.altPred)}`: ''}</div>
-                    <div className="pred-meta-small">{p.method} • {p.strength}</div>
-                  </div>
-                  <div className="pred-row-right">
-                    <div className="pred-prob-small">{(p.score*100).toFixed(1)}%</div>
-                    <div className={`pred-result ${p.result||'pending'}`}>{p.result==='win'?'✅':p.result==='loss'?'❌':'⏳'}</div>
+                    {useAltDocena && currentPred.alt ? (
+                      <>
+                        • Alt plenos:{" "}
+                        {recommendPlenos(currentPred.alt, 4).map((n) => (
+                          <span key={n} className="pleno-pill">
+                            {n}
+                          </span>
+                        ))}
+                      </>
+                    ) : null}
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        </aside>
-      </main>
+              ) : (
+                <div className="muted">
+                  Esperando al menos 10 tiros para predecir...
+                </div>
+              )}
 
-      <footer className="footer">v2.0</footer>
-    </div>
-  );
+              <div className="bot-stats">
+                <div className="stat">
+                  <div className="stat-num">{botStats.won}</div>
+                  <div className="stat-label">Ganadas</div>
+                </div>
+                <div className="stat">
+                  <div className="stat-num">{botStats.lost}</div>
+                  <div className="stat-label">Perdidas</div>
+                </div>
+                <div className="stat">
+                  <div className="stat-num">{effectiveness}%</div>
+                  <div className="stat-label">Efectividad</div>
+                </div>
+              </div>
+
+              <div className="fibo-box">
+                <div>
+                  Fibo ronda: <strong>{fiboIndex + 1}</strong>
+                </div>
+                <div>
+                  Apuesta:{" "}
+                  <strong>
+                    {FIB[Math.min(fiboIndex, FIB.length - 1)]}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="section card history-card">
+              <h3>Historial de Predicciones</h3>
+              <div className="pred-history">
+                {predictions.length === 0 && (
+                  <div className="muted">Sin predicciones</div>
+                )}
+                {predictions
+                  .slice()
+                  .reverse()
+                  .map((p) => (
+                    <div
+                      key={p.id}
+                      className={`pred-row ${
+                        p.result === "win"
+                          ? "win"
+                          : p.result === "loss"
+                          ? "loss"
+                          : ""
+                      }`}
+                    >
+                      <div className="pred-row-left">
+                        <div className="pred-label">
+                          {labelDocena(p.predictedDocena)}
+                          {p.altPred ? ` + ${labelDocena(p.altPred)}` : ""}
+                        </div>
+                        <div className="pred-meta-small">
+                          {p.method} • {p.strength}
+                        </div>
+                      </div>
+                      <div className="pred-row-right">
+                        <div className="pred-prob-small">
+                          {(p.score * 100).toFixed(1)}%
+                        </div>
+                        <div
+                          className={`pred-result ${p.result || "pending"}`}
+                        >
+                          {p.result === "win"
+                            ? "✅"
+                            : p.result === "loss"
+                            ? "❌"
+                            : "⏳"}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </aside>
+        </main>
+
+        <footer className="footer">v2.0</footer>
+      </div>
+    )}
+  </>
+);
 }
