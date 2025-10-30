@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/rouledic2/static/css/main.7d13152b.css",
-    "main.js": "/rouledic2/static/js/main.7b0646c2.js",
+    "main.css": "/rouledic2/static/css/main.c94ed82a.css",
+    "main.js": "/rouledic2/static/js/main.e099dbbf.js",
     "index.html": "/rouledic2/index.html",
-    "main.7d13152b.css.map": "/rouledic2/static/css/main.7d13152b.css.map",
-    "main.7b0646c2.js.map": "/rouledic2/static/js/main.7b0646c2.js.map"
+    "main.c94ed82a.css.map": "/rouledic2/static/css/main.c94ed82a.css.map",
+    "main.e099dbbf.js.map": "/rouledic2/static/js/main.e099dbbf.js.map"
   },
   "entrypoints": [
-    "static/css/main.7d13152b.css",
-    "static/js/main.7b0646c2.js"
+    "static/css/main.c94ed82a.css",
+    "static/js/main.e099dbbf.js"
   ]
 }
